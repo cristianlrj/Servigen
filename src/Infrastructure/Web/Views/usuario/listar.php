@@ -41,8 +41,8 @@ headerAdmin($data);
                           <?php } ?>
                           <td>
                               <?php if ($usuario->getId() != $_SESSION['usuario_id']) { ?>
-                           <a href="<?= base_url() ?>/usuario/editar/<?= $usuario->getId() ?>" class="btn btn-icon btn-primary fs-5"><i class="fa-solid fa-pencil"></i></a>
-                           <a href="<?= base_url() ?>/usuario/eliminar/<?= $usuario->getId() ?>" class="btn btn-icon btn-danger fs-5"><i class="fa-solid fa-trash"></i></a>
+                           <a href="<?= base_url() ?>/usuario/editar/<?= $usuario->getId() ?>" class="btn btn-icon btn-primary fs-5" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Usuario"><i class="fa-solid fa-pencil"></i></a>
+                           <a href="<?= base_url() ?>/usuario/eliminar/<?= $usuario->getId() ?>" class="btn btn-icon btn-danger fs-5" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Usuario"><i class="fa-solid fa-trash"></i></a>
                            <?php } ?>
                         </td>
                         </tr>
@@ -60,3 +60,10 @@ headerAdmin($data);
 <?php
 footerAdmin($data);
 ?>
+<script>
+    // Inicializar tooltips de Bootstrap
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+</script>

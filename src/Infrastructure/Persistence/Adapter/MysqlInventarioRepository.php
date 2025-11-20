@@ -104,11 +104,12 @@ class MysqlInventarioRepository extends MysqlPersistenceAdapter implements Inven
 
             // 4. Insertar el registro del movimiento
             $stmtMov = $this->conn->prepare(
-                "INSERT INTO movimiento_inventario (id_inventario, cantidad, tipo_movimiento, fecha_movimiento) 
-                 VALUES (:id_inventario, :cantidad, :tipo_movimiento, NOW())"
+                "INSERT INTO movimiento_inventario (id_inventario, id_usuario, cantidad, tipo_movimiento, fecha_movimiento) 
+                 VALUES (:id_inventario, :id_usuario, :cantidad, :tipo_movimiento, NOW())"
             );
             $stmtMov->execute([
                 ':id_inventario' => $id_inventario,
+                ':id_usuario' => $_SESSION['usuario_id'],
                 ':cantidad' => $cantidad,
                 ':tipo_movimiento' => $tipo_movimiento
             ]);

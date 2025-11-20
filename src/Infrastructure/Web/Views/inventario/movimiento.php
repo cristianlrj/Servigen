@@ -82,5 +82,25 @@
 </div>
 <?php footerAdmin($data); ?>
 <script>
-    // Inicializar DataTable para el historial si es necesario
+    document.addEventListener('DOMContentLoaded', function() {
+        const stockActual = <?= $data['articulo']->getCantidad() ?>;
+        const tipoMovimientoSelect = document.getElementById('tipo_movimiento');
+        const cantidadInput = document.getElementById('cantidad');
+
+        function validarStock() {
+            const tipo = tipoMovimientoSelect.value;
+            const cantidad = parseInt(cantidadInput.value) || 0;
+
+            if (tipo === 'salida' && cantidad > stockActual) {
+                cantidadInput.setCustomValidity('La cantidad a retirar no puede ser mayor al stock actual (' + stockActual + ').');
+                // Forzar que se muestre el mensaje de error inmediatamente
+                cantidadInput.reportValidity();
+            } else {
+                cantidadInput.setCustomValidity('');
+            }
+        }
+
+        tipoMovimientoSelect.addEventListener('change', validarStock);
+        cantidadInput.addEventListener('input', validarStock);
+    });
 </script>
