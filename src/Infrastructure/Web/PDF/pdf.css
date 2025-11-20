@@ -1,0 +1,103 @@
+body {
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+    font-size: 12px;
+    color: #333;
+    line-height: 1.5;
+  }
+
+  .report-container {
+    width: 100%; /* Usamos 95% en vez de 100% para mPDF */
+    /* Centrado y con márgenes */
+  }
+
+  .cintillo {
+    width: 100%;
+    margin-bottom: 25px;
+  }
+
+  /* --- Título --- */
+  .report-title {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    color: #222;
+    margin-bottom: 25px;
+  }
+
+  /* --- Estilos de la Tabla --- */
+  table {
+    width: 100%;
+    border-collapse: collapse; /* Bordes limpios */
+    margin-top: 20px;
+  }
+
+  /* --- Celdas (Header y Body) --- */
+  th,
+  td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  /* --- Header de la Tabla --- */
+  thead tr {
+    background-color: #f0f0f0; /* Color de fondo para el header */
+  }
+
+  thead th {
+    font-size: 13px;
+    font-weight: bold;
+    color: #444;
+    text-transform: uppercase;
+  }
+
+  /* --- Filas "Cebra" (Striping) --- */
+tbody tr.even-row {
+    background-color: #f9f9f9;
+  }
+
+tbody tr.odd-row {
+    background-color: #ffffff;
+  }
+
+  /* --- Tags de Estado (La parte más visual) --- */
+  .status-tag {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 15px; /* Píldora */
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    color: #000000;
+    min-width: 90px;
+  }
+
+  /* Colores para los tags */
+  .status-pendiente { background-color: #ffce84; /* Naranja */ }
+  .status-en-proceso { background-color: #8ac5ff; /* Azul */ }
+  .status-finalizado { background-color: #b1ff8a; /* Verde */ }
+  .status-cancelado { background-color: #fb8d8d; /* Rojo */ }
+  .status-default { 
+    background-color: #909399; /* Gris */ 
+  }
+
+  .satisfaction-form label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .signature-section {
+      margin-top: 50px;
+      text-align: center;
+    }
+    .signature-box {
+      margin-top: 30px;
+      border-top: 1px solid #000;
+      display: inline-block;
+      padding-top: 5px;
+      width: 60%;
+      text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    
+    }

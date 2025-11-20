@@ -1,0 +1,6 @@
+{
+    "require": {
+        "phpmussel/phpmailer": "3.1",
+        "mpdf/mpdf": "8.2.5"
+    }
+}

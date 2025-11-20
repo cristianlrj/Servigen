@@ -1,0 +1,27 @@
+{
+    "name": "phpmussel/phpmailer",
+    "description": "Uses PHPMailer to provide 2FA and email notifications support for phpMussel v3+",
+    "homepage": "https://phpmussel.github.io/",
+    "license": "GPL-2.0-or-later",
+    "support": {
+        "chat": "https://gitter.im/phpMussel2/Lobby",
+        "issues": "https://github.com/phpMussel/Plugin-PHPMailer/issues",
+        "source": "https://github.com/phpMussel/Plugin-PHPMailer",
+        "docs": "https://github.com/phpMussel/Docs"
+    },
+    "require": {
+        "php": ">=7.2.0",
+        "maikuolan/common": "^2.4.0",
+        "phpmussel/core": "^3.1",
+        "phpmailer/phpmailer": ">=6.2.0"
+    },
+    "suggest": {
+        "phpmussel/frontend": "^3.1",
+        "phpmussel/web": "^3.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "phpMussel\\PHPMailer\\": "src/"
+        }
+    }
+}
