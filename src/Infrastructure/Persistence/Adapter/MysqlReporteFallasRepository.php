@@ -226,8 +226,16 @@ class MysqlReporteFallasRepository extends MysqlPersistenceAdapter implements Re
         }
     }
 
-        public function getDashboardStats(): array {
+        public function getDashboardStats(?int $month = null, ?int $year = null): array {
         
+        $whereClause = "";
+        $params = [];
+
+        if ($month !== null && $year !== null) {
+            $whereClause = "WHERE MONTH(t2.fecha_creacion) = :month AND YEAR(t2.fecha_creacion) = :year";
+            $params = [':month' => $month, ':year' => $year];
+        }
+
         $sql = "
             -- CTE 1: 'EventTimestamps' pivota las fechas de los eventos
             WITH EventTimestamps AS (
@@ -247,9 +255,7 @@ class MysqlReporteFallasRepository extends MysqlPersistenceAdapter implements Re
                     reporte_fallas as t2
                 LEFT JOIN 
                     descripcion_falla as t1 ON t1.umypf_n = t2.umypf_n
-                WHERE 
-                    MONTH(t2.fecha_creacion) = MONTH(CURDATE())
-                    AND YEAR(t2.fecha_creacion) = YEAR(CURDATE())
+                $whereClause
                 GROUP BY
                     t2.umypf_n, t2.fecha_creacion
             ),
@@ -265,9 +271,7 @@ class MysqlReporteFallasRepository extends MysqlPersistenceAdapter implements Re
                     descripcion_falla as t1
                 JOIN 
                     reporte_fallas as t2 ON t1.umypf_n = t2.umypf_n
-                WHERE 
-                    MONTH(t2.fecha_creacion) = MONTH(CURDATE())
-                    AND YEAR(t2.fecha_creacion) = YEAR(CURDATE())
+                $whereClause
             ),
             
             -- CTE 3: 'CurrentStates' filtra solo el estado más reciente (rn = 1)
@@ -296,7 +300,7 @@ class MysqlReporteFallasRepository extends MysqlPersistenceAdapter implements Re
         ";
         
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute();
+        $stmt->execute($params);
         
         // fetch() está bien porque la consulta SIEMPRE devuelve 1 fila de totales
         return $stmt->fetch(PDO::FETCH_ASSOC); 

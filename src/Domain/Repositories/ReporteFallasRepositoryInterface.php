@@ -21,7 +21,7 @@ interface ReporteFallasRepositoryInterface {
 
     public function findByEstado(string $estado): array;
 
-    public function getDashboardStats(): array;
+    public function getDashboardStats(?int $month = null, ?int $year = null): array;
 
     public function getTareasRecientes(int $limit = 5): array;
 

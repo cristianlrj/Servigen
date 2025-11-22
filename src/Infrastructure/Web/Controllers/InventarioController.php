@@ -52,11 +52,11 @@ class InventarioController extends BaseController {
                 $registrarInventarioUseCase->ejecutar(
                     $codigo, $nombre, $marca, $tipo, $descripcion, (int)$cantidad, (int)$idTaller
                 );
-                $_SESSION['success'] = "Artículo de inventario registrado exitosamente.";
+                $_SESSION['success'] = "Artículo de almacén registrado exitosamente.";
                 header("Location: " . base_url() . "/inventario/listar");
                 exit;
             } catch (\Exception $e) {
-                $_SESSION['error'] = "Error al registrar el artículo de inventario: " . $e->getMessage();
+                $_SESSION['error'] = "Error al registrar el artículo de almacén: " . $e->getMessage();
                 header("Location: " . base_url() . "/inventario/crear");
                 exit;
             }
@@ -82,7 +82,7 @@ class InventarioController extends BaseController {
         } catch (\Exception $e) {
             $this->data['inventario'] = [];
             $this->data['talleres'] = [];
-            $_SESSION['error'] = "Error al cargar los datos del inventario: " . $e->getMessage();
+            $_SESSION['error'] = "Error al cargar los datos del almacén: " . $e->getMessage();
         }
 
         $data = $this->data;
@@ -101,7 +101,7 @@ class InventarioController extends BaseController {
     }
 
     public function editar($id) {
-        $this->data['title'] = 'Editar Artículo de Inventario';
+        $this->data['title'] = 'Editar Artículo de almacén';
 
         $inventarioRepo = new MysqlInventarioRepository();
         $getInventarioUseCase = new GetInventarioUseCase($inventarioRepo);
@@ -162,7 +162,7 @@ class InventarioController extends BaseController {
     }
 
     public function movimiento($id) {
-        $this->data['title'] = 'Movimiento de Inventario';
+        $this->data['title'] = 'Movimiento de almacén';
 
         $inventarioRepo = new MysqlInventarioRepository();
         $getInventarioUseCase = new GetInventarioUseCase($inventarioRepo);
@@ -199,10 +199,10 @@ class InventarioController extends BaseController {
                 $useCase = new RegistrarMovimientoInventarioUseCase($repo);
                 $useCase->ejecutar((int)$id_inventario, (int)$cantidad, $tipo_movimiento);
 
-                $_SESSION['success'] = "Movimiento de inventario registrado exitosamente.";
+                $_SESSION['success'] = "Movimiento de almacén registrado exitosamente.";
                 header('Location: ' . base_url() . '/inventario/listar/' . $id_inventario);
             } catch (\Exception $e) {
-                $_SESSION['error'] = "Error al registrar el movimiento: " . $e->getMessage();
+                $_SESSION['error'] = "Error al registrar el almacén: " . $e->getMessage();
                 header('Location: ' . base_url() . '/inventario/listar/' . $id_inventario);
             }
         }
