@@ -4,10 +4,13 @@ namespace Infrastructure\Persistence\Adapter;
 use Domain\Entities\Inventario;
 use Domain\Repositories\InventarioRepositoryInterface;
 use PDO;
+use Exception;
 
-class MysqlInventarioRepository extends MysqlPersistenceAdapter implements InventarioRepositoryInterface {
+class MysqlInventarioRepository extends MysqlPersistenceAdapter implements InventarioRepositoryInterface
+{
 
-    private function mapRowToEntity(array $row): Inventario {
+    private function mapRowToEntity(array $row): Inventario
+    {
         return new Inventario(
             $row['id_inventario'],
             $row['codigo'],
@@ -21,7 +24,8 @@ class MysqlInventarioRepository extends MysqlPersistenceAdapter implements Inven
         );
     }
 
-    public function getAll(): array {
+    public function getAll(): array
+    {
         $stmt = $this->conn->query("SELECT * FROM inventario WHERE status = 1 ORDER BY nombre ASC");
         $items = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -30,14 +34,16 @@ class MysqlInventarioRepository extends MysqlPersistenceAdapter implements Inven
         return $items;
     }
 
-    public function findById(int $id): ?Inventario {
+    public function findById(int $id): ?Inventario
+    {
         $stmt = $this->conn->prepare("SELECT * FROM inventario WHERE id_inventario = :id AND status = 1");
         $stmt->execute([':id' => $id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row ? $this->mapRowToEntity($row) : null;
     }
 
-    public function save(Inventario $item): void {
+    public function save(Inventario $item): void
+    {
         $stmt = $this->conn->prepare(
             "INSERT INTO inventario (codigo, nombre, marca, tipo, descripcion, stock, id_taller, id_usuario, status) 
              VALUES (:codigo, :nombre, :marca, :tipo, :descripcion, :cantidad, :id_taller, :id_usuario, 1)"
@@ -54,7 +60,8 @@ class MysqlInventarioRepository extends MysqlPersistenceAdapter implements Inven
         ]);
     }
 
-    public function update(Inventario $item): void {
+    public function update(Inventario $item): void
+    {
         $stmt = $this->conn->prepare(
             "UPDATE inventario SET 
                 codigo = :codigo, nombre = :nombre, marca = :marca, tipo = :tipo, 
@@ -72,7 +79,8 @@ class MysqlInventarioRepository extends MysqlPersistenceAdapter implements Inven
         ]);
     }
 
-    public function registrarMovimiento(int $id_inventario, int $cantidad, string $tipo_movimiento): void {
+    public function registrarMovimiento(int $id_inventario, int $cantidad, string $tipo_movimiento, ?string $motivo = null): void
+    {
         $this->conn->beginTransaction();
         try {
             // 1. Obtener el artículo y bloquear la fila para la actualización
@@ -104,14 +112,15 @@ class MysqlInventarioRepository extends MysqlPersistenceAdapter implements Inven
 
             // 4. Insertar el registro del movimiento
             $stmtMov = $this->conn->prepare(
-                "INSERT INTO movimiento_inventario (id_inventario, id_usuario, cantidad, tipo_movimiento, fecha_movimiento) 
-                 VALUES (:id_inventario, :id_usuario, :cantidad, :tipo_movimiento, NOW())"
+                "INSERT INTO movimiento_inventario (id_inventario, id_usuario, cantidad, tipo_movimiento, motivo, fecha_movimiento) 
+                 VALUES (:id_inventario, :id_usuario, :cantidad, :tipo_movimiento, :motivo, NOW())"
             );
             $stmtMov->execute([
                 ':id_inventario' => $id_inventario,
                 ':id_usuario' => $_SESSION['usuario_id'],
                 ':cantidad' => $cantidad,
-                ':tipo_movimiento' => $tipo_movimiento
+                ':tipo_movimiento' => $tipo_movimiento,
+                ':motivo' => $motivo
             ]);
 
             $this->conn->commit();
@@ -121,13 +130,15 @@ class MysqlInventarioRepository extends MysqlPersistenceAdapter implements Inven
         }
     }
 
-    public function findMovimientosByInventarioId(int $id_inventario): array {
+    public function findMovimientosByInventarioId(int $id_inventario): array
+    {
         $stmt = $this->conn->prepare("SELECT * FROM movimiento_inventario WHERE id_inventario = :id ORDER BY fecha_movimiento DESC");
         $stmt->execute([':id' => $id_inventario]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function delete(int $id): void {
+    public function delete(int $id): void
+    {
         $stmt = $this->conn->prepare("UPDATE inventario SET status = 0 WHERE id = :id");
         $stmt->execute([':id' => $id]);
     }

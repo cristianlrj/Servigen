@@ -26,10 +26,12 @@ use Infrastructure\Persistence\Adapter\MysqlInventarioRepository;
 use Infrastructure\Persistence\Adapter\MysqlUsuarioRepository;
 use Infrastructure\Persistence\Adapter\MysqlDepartamentoRepository;
 
-class ReporteFallasController extends BaseController {
+class ReporteFallasController extends BaseController
+{
 
-    public function listar() {
-        
+    public function listar()
+    {
+
         $this->data['title'] = 'Reportes de Fallas';
 
         try {
@@ -51,7 +53,7 @@ class ReporteFallasController extends BaseController {
 
             $departamentoRepo = new MysqlDepartamentoRepository();
             $getDepartamentoUseCase = new GetDepartamentoUseCase($departamentoRepo); // Usar el caso de uso correcto
-            
+
 
             $this->data['talleres'] = $talleres;
             $this->data['fallas'] = $resultados;
@@ -68,9 +70,10 @@ class ReporteFallasController extends BaseController {
         include __DIR__ . '/../Views/reporteFallas/listar.php';
     }
 
-    public function crear() {
+    public function crear()
+    {
         $this->data['title'] = 'Crear Reporte de Fallas';
-        
+
         // El método 'crear' también necesita un caso de uso para obtener los talleres
         // Ej: GetDatosParaFormularioFallaUseCase
         $tallerRepo = new MysqlTallerRepository();
@@ -86,9 +89,10 @@ class ReporteFallasController extends BaseController {
         include __DIR__ . '/../Views/reporteFallas/crear.php';
     }
 
-    public function editar($id) {
+    public function editar($id)
+    {
         $this->data['title'] = 'Actualizar Reporte de Fallas';
-        
+
         $reporteFallasRepo = new MysqlReporteFallasRepository();
         $getReporteFallaUseCase = new GetReporteFallasUseCase($reporteFallasRepo);
 
@@ -103,7 +107,7 @@ class ReporteFallasController extends BaseController {
         $inventarioCompleto = $getAllInventarioUseCase->ejecutar();
 
         // 2. Filtrar por tipo ('Materia prima', 'Consumible') Y por el taller de la falla
-        $materialesFiltrados = array_filter($inventarioCompleto, function($item) use ($idTallerFalla) {
+        $materialesFiltrados = array_filter($inventarioCompleto, function ($item) use ($idTallerFalla) {
             $esTipoCorrecto = in_array($item->getTipo(), ['Materia prima', 'Consumible']);
             $esDelTallerCorrecto = $item->getIdTaller() == $idTallerFalla;
             return $esTipoCorrecto && $esDelTallerCorrecto;
@@ -119,7 +123,8 @@ class ReporteFallasController extends BaseController {
         include __DIR__ . '/../Views/reporteFallas/actualizar.php';
     }
 
-    public function guardar() {
+    public function guardar()
+    {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Recoger datos del formulario
             $idUsuario = $_SESSION['usuario_id']; // Asumiendo que el ID del usuario está en la sesión
@@ -145,7 +150,7 @@ class ReporteFallasController extends BaseController {
                     $idUsuario,
                     $idTaller,
                     $unidadSolicitante,
-                    $personaContacto, 
+                    $personaContacto,
                     $emailContacto,
                     $descripcion
                 );
@@ -161,7 +166,8 @@ class ReporteFallasController extends BaseController {
         }
     }
 
-    public function enviarCorreoSatisfaccion($umypf_n) {
+    public function enviarCorreoSatisfaccion($umypf_n)
+    {
         if (empty($umypf_n)) {
             $_SESSION['error'] = "ID de reporte no proporcionado.";
             header('Location: ' . base_url() . '/reporteFallas/listar');
@@ -171,7 +177,7 @@ class ReporteFallasController extends BaseController {
         try {
             $reporteFallasRepo = new MysqlReporteFallasRepository();
             $getReporteUseCase = new GetReporteFallasUseCase($reporteFallasRepo);
-            $falla = $getReporteUseCase->ejecutar((int)$umypf_n);
+            $falla = $getReporteUseCase->ejecutar((int) $umypf_n);
 
             if (!$falla || !$falla->getEmailContacto()) {
                 $_SESSION['error'] = "El reporte no existe o no tiene un correo de contacto asociado.";
@@ -181,29 +187,31 @@ class ReporteFallasController extends BaseController {
 
             $emailCliente = $falla->getEmailContacto();
 
-                // Usar el nuevo caso de uso para generar y guardar el token
-                $guardarTokenUseCase = new GuardarTokenSatisfaccionUseCase($reporteFallasRepo);
-                $token = $guardarTokenUseCase->ejecutar((int)$umypf_n);
+            // Usar el nuevo caso de uso para generar y guardar el token
+            $guardarTokenUseCase = new GuardarTokenSatisfaccionUseCase($reporteFallasRepo);
+            $token = $guardarTokenUseCase->ejecutar((int) $umypf_n);
 
-                // El enlace ahora apunta al nuevo controlador público
-                $link = base_url() . "/satisfaccion/formulario/" . $token;
-                
-                $emailService = new EmailService();
-                $body = "<h1>Encuesta de Satisfacción</h1><p>Por favor, ayúdenos a mejorar nuestro servicio calificando la atención recibida para el reporte de falla.</p><p>Haga clic en el siguiente enlace para acceder a la encuesta:</p><p><a href='{$link}' style='background-color: #0d6efd; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>Calificar Servicio</a></p><p>Este enlace será válido por 7 días.</p>";
-                $emailService->send($emailCliente, "Cliente", "Encuesta de Satisfacción - Reporte #" . $umypf_n, $body);
+            // El enlace ahora apunta al nuevo controlador público
+            $link = base_url() . "/satisfaccion/formulario/" . $token;
 
-                $_SESSION['success'] = "Correo de satisfacción enviado exitosamente.";
-            } catch (\Exception $e) {
+            $emailService = new EmailService();
+            $body = "<h1>Encuesta de Satisfacción</h1><p>Por favor, ayúdenos a mejorar nuestro servicio calificando la atención recibida para el reporte de falla.</p><p>Haga clic en el siguiente enlace para acceder a la encuesta:</p><p><a href='{$link}' style='background-color: #0d6efd; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>Calificar Servicio</a></p><p>Este enlace será válido por 7 días.</p>";
+            $emailService->send($emailCliente, "Cliente", "Encuesta de Satisfacción - Reporte #" . $umypf_n, $body);
+
+            $_SESSION['success'] = "Correo de satisfacción enviado exitosamente.";
+        } catch (\Exception $e) {
             $_SESSION['error'] = "Error al enviar el correo de satisfacción: " . $e->getMessage();
         }
         header('Location: ' . base_url() . '/reporteFallas/listar');
     }
 
-    public function actualizarEstado() {
+    public function actualizarEstado()
+    {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $umypf_n = $_POST['umypf_n'] ?? null;
             $descripcion = $_POST['descripcion'] ?? '';
             $estado = $_POST['estado'] ?? '';
+            $materiales = $_POST['materiales'] ?? []; // Obtener materiales del formulario
 
             if (empty($umypf_n) || empty($descripcion) || empty($estado)) {
                 $_SESSION['error'] = "Todos los campos son obligatorios para actualizar el estado.";
@@ -215,7 +223,28 @@ class ReporteFallasController extends BaseController {
                 $reporteFallasRepo = new MysqlReporteFallasRepository();
                 $editarReporteFallasUseCase = new EditarReporteFallasUseCase($reporteFallasRepo);
 
-                $editarReporteFallasUseCase->ejecutar((int)$umypf_n, $descripcion, $estado);
+                $editarReporteFallasUseCase->ejecutar((int) $umypf_n, $descripcion, $estado);
+
+                // --- Lógica para Movimientos de Inventario ---
+                if ($estado === 'Finalizada' && !empty($materiales)) {
+                    $inventarioRepo = new MysqlInventarioRepository();
+                    $registrarMovimientoUseCase = new \Application\UseCases\Inventario\RegistrarMovimientoInventarioUseCase($inventarioRepo);
+
+                    foreach ($materiales as $material) {
+                        $idMaterial = $material['id'] ?? null;
+                        $cantidad = $material['cantidad'] ?? 0;
+
+                        if ($idMaterial && $cantidad > 0) {
+                            $registrarMovimientoUseCase->ejecutar(
+                                (int) $idMaterial,
+                                (int) $cantidad,
+                                'salida',
+                                "Reporte de Falla #$umypf_n"
+                            );
+                        }
+                    }
+                }
+                // ---------------------------------------------
 
                 $_SESSION['success'] = "Estado del reporte de falla actualizado exitosamente.";
                 header('Location: ' . base_url() . '/reporteFallas/listar');
@@ -228,5 +257,5 @@ class ReporteFallasController extends BaseController {
         }
     }
 
-    
+
 }

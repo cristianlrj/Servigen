@@ -15,9 +15,11 @@ use Application\UseCases\Taller\getAllTalleresUseCase;
 use Infrastructure\Persistence\Adapter\MysqlInventarioRepository;
 use Infrastructure\Persistence\Adapter\MysqlTallerRepository;
 
-class InventarioController extends BaseController {
+class InventarioController extends BaseController
+{
 
-    public function crear() {
+    public function crear()
+    {
         $this->data['title'] = "Registrar Item";
 
         $tallerRepo = new MysqlTallerRepository();
@@ -29,7 +31,8 @@ class InventarioController extends BaseController {
         include __DIR__ . '/../Views/inventario/crear.php';
     }
 
-    public function registrar() {
+    public function registrar()
+    {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $codigo = $_POST['codigo'] ?? '';
             $nombre = $_POST['nombre'] ?? '';
@@ -50,7 +53,13 @@ class InventarioController extends BaseController {
 
             try {
                 $registrarInventarioUseCase->ejecutar(
-                    $codigo, $nombre, $marca, $tipo, $descripcion, (int)$cantidad, (int)$idTaller
+                    $codigo,
+                    $nombre,
+                    $marca,
+                    $tipo,
+                    $descripcion,
+                    (int) $cantidad,
+                    (int) $idTaller
                 );
                 $_SESSION['success'] = "Artículo de almacén registrado exitosamente.";
                 header("Location: " . base_url() . "/inventario/listar");
@@ -63,7 +72,8 @@ class InventarioController extends BaseController {
         }
     }
 
-    public function listar() {
+    public function listar()
+    {
         $this->data['title'] = 'Listar Almacén';
 
         try {
@@ -90,7 +100,7 @@ class InventarioController extends BaseController {
         // Obtener los tipos únicos de inventario para el filtro
         $tipos = [];
         if (!empty($this->data['inventario'])) {
-            $tipos = array_unique(array_map(function($item) {
+            $tipos = array_unique(array_map(function ($item) {
                 return $item->getTipo();
             }, $this->data['inventario']));
             sort($tipos);
@@ -100,7 +110,8 @@ class InventarioController extends BaseController {
         include __DIR__ . '/../Views/inventario/listar.php';
     }
 
-    public function editar($id) {
+    public function editar($id)
+    {
         $this->data['title'] = 'Editar Artículo de almacén';
 
         $inventarioRepo = new MysqlInventarioRepository();
@@ -117,7 +128,8 @@ class InventarioController extends BaseController {
         include __DIR__ . '/../Views/inventario/editar.php';
     }
 
-    public function actualizar() {
+    public function actualizar()
+    {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'] ?? null;
             $codigo = $_POST['codigo'] ?? '';
@@ -137,7 +149,13 @@ class InventarioController extends BaseController {
                 $repo = new MysqlInventarioRepository(); // Asumo que tienes este repositorio
                 $useCase = new EditarInventarioUseCase($repo);
                 $useCase->ejecutar(
-                    (int)$id, $codigo, $nombre, $marca, $tipo, $descripcion, (int)$idTaller
+                    (int) $id,
+                    $codigo,
+                    $nombre,
+                    $marca,
+                    $tipo,
+                    $descripcion,
+                    (int) $idTaller
                 );
 
                 $_SESSION['success'] = "Artículo actualizado exitosamente.";
@@ -149,11 +167,12 @@ class InventarioController extends BaseController {
         }
     }
 
-    public function eliminar($id) {
+    public function eliminar($id)
+    {
         try {
             $repo = new MysqlInventarioRepository();
             $useCase = new EliminarInventarioUseCase($repo);
-            $useCase->ejecutar((int)$id);
+            $useCase->ejecutar((int) $id);
             $_SESSION['success'] = "Artículo desactivado correctamente.";
         } catch (\Exception $e) {
             $_SESSION['error'] = "Error al desactivar el artículo: " . $e->getMessage();
@@ -161,7 +180,8 @@ class InventarioController extends BaseController {
         header('Location: ' . base_url() . '/inventario/listar');
     }
 
-    public function movimiento($id) {
+    public function movimiento($id)
+    {
         $this->data['title'] = 'Movimiento de almacén';
 
         $inventarioRepo = new MysqlInventarioRepository();
@@ -182,11 +202,13 @@ class InventarioController extends BaseController {
         include __DIR__ . '/../Views/inventario/movimiento.php';
     }
 
-    public function registrarMovimiento() {
+    public function registrarMovimiento()
+    {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id_inventario = $_POST['id_inventario'] ?? null;
             $cantidad = $_POST['cantidad'] ?? null;
             $tipo_movimiento = $_POST['tipo_movimiento'] ?? '';
+            $motivo = $_POST['motivo'] ?? null;
 
             if (empty($id_inventario) || empty($cantidad) || empty($tipo_movimiento)) {
                 $_SESSION['error'] = "Todos los campos son obligatorios.";
@@ -197,7 +219,7 @@ class InventarioController extends BaseController {
             try {
                 $repo = new MysqlInventarioRepository();
                 $useCase = new RegistrarMovimientoInventarioUseCase($repo);
-                $useCase->ejecutar((int)$id_inventario, (int)$cantidad, $tipo_movimiento);
+                $useCase->ejecutar((int) $id_inventario, (int) $cantidad, $tipo_movimiento, $motivo);
 
                 $_SESSION['success'] = "Movimiento de almacén registrado exitosamente.";
                 header('Location: ' . base_url() . '/inventario/listar/' . $id_inventario);

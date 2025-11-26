@@ -35,6 +35,11 @@
                             <input type="number" class="form-control" id="cantidad" name="cantidad" min="1" required>
                         </div>
 
+                        <div class="mb-3">
+                            <label for="motivo" class="form-label">Motivo</label>
+                            <input type="text" class="form-control" id="motivo" name="motivo" placeholder="Razón del movimiento">
+                        </div>
+
                         <button type="submit" class="btn btn-primary">Registrar Movimiento</button>
                         <a href="<?= base_url() ?>/inventario/listar" class="btn btn-secondary">Volver al Listado</a>
                     </form>
@@ -56,6 +61,7 @@
                                     <th>Fecha</th>
                                     <th>Tipo</th>
                                     <th>Cantidad</th>
+                                    <th>Motivo</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -70,6 +76,7 @@
                                                 <?php endif; ?>
                                             </td>
                                             <td><?= htmlspecialchars($movimiento['cantidad']) ?></td>
+                                            <td><?= htmlspecialchars($movimiento['motivo'] ?? '-') ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                             </tbody>
