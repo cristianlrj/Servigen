@@ -1,7 +1,7 @@
 <?php
 define('APP_ROOT', dirname(__DIR__));
 define('BASE_URL', 'http://localhost/servigen'); //RUTA DEL PROYECTO
-define('API_URL', 'http://localhost/servigen/public/assets/api.json');
+define('API_URL', 'http://api.uptos.edu.ve/1.7.7/directory/search_person.json');
 define('API_TOKEN', '123');
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'servigen');

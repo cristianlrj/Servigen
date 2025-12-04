@@ -29,6 +29,8 @@ use Infrastructure\Persistence\Adapter\MysqlAreaRepository;
 use Application\UseCases\Inventario\GetAllInventarioUseCase;
 use Infrastructure\Persistence\Adapter\MysqlInventarioRepository;
 
+use Application\UseCases\Taller\getAllTalleresUseCase;
+
 
 class ReporteController extends BaseController {
 
@@ -56,14 +58,16 @@ class ReporteController extends BaseController {
         $usuarioRepo = new MysqlUsuarioRepository();
         $getUsuarioUseCase = new getUsuarioUseCase($usuarioRepo);
 
-        $tallerRpero = new MysqlTallerRepository();
-        $getTallerUseCase = new ObtenerTaller($tallerRpero);
+        $tallerRepo = new MysqlTallerRepository();
+        $getTallerUseCase = new ObtenerTaller($tallerRepo);
 
         $departamentoRepo = new MysqlDepartamentoRepository();
         $getDepartamentoUseCase = new GetDepartamentoUseCase($departamentoRepo);
 
         $tallerId = null;
         $estado = null;
+        $fechaInicio = null;
+        $fechaFin = null;
 
         if ($params !== null) {
             $paramArray = explode(',', $params);
@@ -73,28 +77,55 @@ class ReporteController extends BaseController {
             if (isset($paramArray[1]) && $paramArray[1] !== 'null') {
                 $estado = $paramArray[1];
             }
+            if (isset($paramArray[2]) && $paramArray[2] !== 'null') {
+                $fechaInicio = $paramArray[2];
+            }
+            if (isset($paramArray[3]) && $paramArray[3] !== 'null') {
+                $fechaFin = $paramArray[3];
+            }
         }
 
         $reportes = $getAllReporteFallas->ejecutar();
 
-        // Filtrar los reportes si se proporcionaron tallerId o estado
-        $reportesFiltrados = array_filter($reportes, function($reporte) use ($tallerId, $estado) {
+        // Filtrar los reportes si se proporcionaron tallerId o estado o fechas
+        $reportesFiltrados = array_filter($reportes, function($reporte) use ($tallerId, $estado, $fechaInicio, $fechaFin) {
             $matchTaller = ($tallerId === null || $reporte->getIdTaller() == $tallerId);
             $matchEstado = ($estado === null || $reporte->getEstado() == $estado);
-            return $matchTaller && $matchEstado;
+            
+            $matchFecha = true;
+            if ($fechaInicio !== null || $fechaFin !== null) {
+                $fechaReporte = date('Y-m-d', strtotime($reporte->getFechaCreacion()));
+                if ($fechaInicio !== null && $fechaReporte < $fechaInicio) {
+                    $matchFecha = false;
+                }
+                if ($fechaFin !== null && $fechaReporte > $fechaFin) {
+                    $matchFecha = false;
+                }
+            }
+
+            return $matchTaller && $matchEstado && $matchFecha;
         });
 
         $reportes = $reportesFiltrados;
         
         $titulo = "Reporte de fallas";
-        if ($tallerId !== null && $estado !== null) {
+        $filtrosTexto = [];
+        if ($tallerId !== null) {
             $taller = $getTallerUseCase->ejecutar($tallerId);
-            $titulo .= " - Taller: " . ($taller ? $taller->getNombreTaller() : 'Desconocido') . " | Estado: " . $estado;
-        } elseif ($tallerId !== null) {
-            $taller = $getTallerUseCase->ejecutar($tallerId);
-            $titulo .= " - Taller: " . ($taller ? $taller->getNombreTaller() : 'Desconocido');
-        } elseif ($estado !== null) {
-            $titulo .= " - Estado: " . $estado;
+            $filtrosTexto[] = "Taller: " . ($taller ? $taller->getNombreTaller() : 'Desconocido');
+        }
+        if ($estado !== null) {
+            $filtrosTexto[] = "Estado: " . $estado;
+        }
+        if ($fechaInicio !== null) {
+            $filtrosTexto[] = "Desde: " . $fechaInicio;
+        }
+        if ($fechaFin !== null) {
+            $filtrosTexto[] = "Hasta: " . $fechaFin;
+        }
+
+        if (!empty($filtrosTexto)) {
+            $titulo .= " - " . implode(" | ", $filtrosTexto);
         }
         include __DIR__ . '/../PDF/reporteFallas.php';
 
@@ -221,7 +252,7 @@ class ReporteController extends BaseController {
         }
 
         // Para obtener el nombre del taller en la tabla
-        $talleres = (new \Application\UseCases\Taller\GetAllTalleresUseCase($tallerRepo))->ejecutar();
+        $talleres = (new getAllTalleresUseCase($tallerRepo))->ejecutar();
         $talleresMap = [];
         foreach ($talleres as $taller) {
             $talleresMap[$taller->getId()] = $taller->getNombreTaller();
@@ -281,7 +312,7 @@ class ReporteController extends BaseController {
             $titulo .= " - Tipo: " . htmlspecialchars($tipo);
         }
 
-        $talleres = (new \Application\UseCases\Taller\GetAllTalleresUseCase($tallerRepo))->ejecutar();
+        $talleres = (new getAllTalleresUseCase($tallerRepo))->ejecutar();
         $talleresMap = [];
         foreach ($talleres as $taller) {
             $talleresMap[$taller->getId()] = $taller->getNombreTaller();

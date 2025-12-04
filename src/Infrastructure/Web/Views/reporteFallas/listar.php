@@ -39,11 +39,20 @@ headerAdmin($data);
                         <option value="Cancelada">Cancelada</option>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label for="fechaInicio">Fecha Inicio:</label>
+                    <input type="date" class="form-control" id="fechaInicio">
+                </div>
+                <div class="form-group">
+                    <label for="fechaFin">Fecha Fin:</label>
+                    <input type="date" class="form-control" id="fechaFin">
+                </div>
                 </div>
                   <table id="datatable" class="table table-sm w-100 responsive" data-toggle="data-table">
                      <thead>
                     <tr>
                         <th>UMYPF-N°</th>
+                        <th>Fecha</th>
                         <th>Unidad Solicitante</th>
                         <th>Persona de Contacto</th>
                         <th>Descripción de la Falla</th>
@@ -77,6 +86,7 @@ headerAdmin($data);
             ?>
             <tr>
                 <td><?= str_pad($falla->getId(), 5, '0', STR_PAD_LEFT) ?></td>
+                <td><?= htmlspecialchars(date('Y-m-d', strtotime($falla->getFechaCreacion()))) ?></td>
                 <td><?= htmlspecialchars($departamento->getNombre()) ?></td>
                 <td><?= htmlspecialchars($falla->getPersonaContacto()) ?></td>
                 <td><?= htmlspecialchars($falla->getDescripcion()) ?></td>
@@ -131,27 +141,59 @@ document.addEventListener('DOMContentLoaded', function() {
     const dataTable = $('#datatable').DataTable();
     const filterTaller = document.getElementById('filterTaller');
     const filterEstado = document.getElementById('filterEstado');
+    const fechaInicio = document.getElementById('fechaInicio');
+    const fechaFin = document.getElementById('fechaFin');
     const generarReportePdfButton = document.getElementById('generarReportePdf');
+
+    // Custom filtering function which will search data in column 1 between two values
+    $.fn.dataTable.ext.search.push(
+        function( settings, data, dataIndex ) {
+            var min = fechaInicio.value ? new Date(fechaInicio.value + 'T00:00:00') : null;
+            var max = fechaFin.value ? new Date(fechaFin.value + 'T23:59:59') : null;
+            var dateStr = data[1]; // Column 1 is Fecha
+            var date = new Date(dateStr + 'T00:00:00'); // Assuming Y-m-d format
+
+            if (
+                ( min === null && max === null ) ||
+                ( min === null && date <= max ) ||
+                ( min <= date   && max === null ) ||
+                ( min <= date   && date <= max )
+            ) {
+                return true;
+            }
+            return false;
+        }
+    );
 
     function applyFilters() {
         const selectedTallerName = filterTaller.value;
         const selectedTallerId = filterTaller.options[filterTaller.selectedIndex].dataset.tallerId;
         const selectedEstado = filterEstado.value;
+        const selectedFechaInicio = fechaInicio.value;
+        const selectedFechaFin = fechaFin.value;
 
-        // Filtrar por taller (columna 4)
-        dataTable.column(4).search(selectedTallerName).draw();
+        // Filtrar por taller (columna 5 ahora, se movió por la columna Fecha)
+        dataTable.column(5).search(selectedTallerName).draw();
 
-        // Filtrar por estado (columna 6)
-        dataTable.column(6).search(selectedEstado).draw();
+        // Filtrar por estado (columna 7 ahora)
+        dataTable.column(7).search(selectedEstado).draw();
+        
+        // Redraw table for date filter
+        dataTable.draw();
 
         // Actualizar el enlace del PDF
         const tallerParam = selectedTallerId ? selectedTallerId : 'null';
         const estadoParam = selectedEstado ? selectedEstado : 'null';
-        generarReportePdfButton.href = `<?= base_url() ?>/reporte/reporteFallasPdf/${tallerParam}/${estadoParam}`;
+        const fechaInicioParam = selectedFechaInicio ? selectedFechaInicio : 'null';
+        const fechaFinParam = selectedFechaFin ? selectedFechaFin : 'null';
+        
+        generarReportePdfButton.href = `<?= base_url() ?>/reporte/reporteFallasPdf/${tallerParam},${estadoParam},${fechaInicioParam},${fechaFinParam}`;
 
     }
 
     filterTaller.addEventListener('change', applyFilters);
     filterEstado.addEventListener('change', applyFilters);
+    fechaInicio.addEventListener('change', applyFilters);
+    fechaFin.addEventListener('change', applyFilters);
 });
 </script>

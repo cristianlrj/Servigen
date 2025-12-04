@@ -59,10 +59,10 @@
                                 <div>
                                     <h6 class="mb-2 card-title">Tiempo Aceptación</h6>
                                 </div>
-                                <i class="fa-solid fa-hourglass-start fa-2x text-info"></i>
+                                <i class="fa-solid fa-hourglass-start fa-2x text-<?= $data['status_aceptacion'] ?? 'info' ?>"></i>
                              </div>
                              <div class="mt-3">
-                                <h4 class="counter text-info"><?= $data['tiempo_promedio_aceptacion'] ?? 'N/A' ?></h4>
+                                <h4 class="counter text-<?= $data['status_aceptacion'] ?? 'info' ?>"><?= $data['tiempo_promedio_aceptacion'] ?? 'N/A' ?></h4>
                                 <small class="text-muted">Meta: 2 Horas</small>
                              </div>
                         </div>
@@ -75,10 +75,10 @@
                                 <div>
                                     <h6 class="mb-2 card-title">Tiempo Solución</h6>
                                 </div>
-                                <i class="fa-solid fa-stopwatch fa-2x text-primary"></i>
+                                <i class="fa-solid fa-stopwatch fa-2x text-<?= $data['status_solucion'] ?? 'primary' ?>"></i>
                              </div>
                              <div class="mt-3">
-                                <h4 class="counter text-primary"><?= $data['tiempo_promedio_solucion'] ?? 'N/A' ?></h4>
+                                <h4 class="counter text-<?= $data['status_solucion'] ?? 'primary' ?>"><?= $data['tiempo_promedio_solucion'] ?? 'N/A' ?></h4>
                                 <small class="text-muted">Meta: 2 dia</small>
                              </div>
                         </div>
@@ -91,14 +91,14 @@
                 <div class="card-body">
                      <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h5 class="mb-2 card-title">Satisfacción Promedio</h5>
+                            <h5 class="mb-2 card-title">Índice de satisfacción</h5>
                         </div>
-                        <i class="fa-solid fa-ranking-star fa-3x text-warning"></i>
+                        <i class="fa-solid fa-ranking-star fa-3x text-<?= $data['status_satisfaccion'] ?? 'warning' ?>"></i>
                      </div>
                      <div class="mt-3">
-                        <h2 class="counter text-warning"><?= $data['promedio_satisfaccion'] ?? '0' ?>%</h2>
+                        <h2 class="counter text-<?= $data['status_satisfaccion'] ?? 'warning' ?>"><?= $data['promedio_satisfaccion'] ?? '0' ?>%</h2>
                         <div class="progress mt-2" style="height: 10px;">
-                            <div class="progress-bar bg-warning" role="progressbar" style="width: <?= $data['promedio_satisfaccion'] ?? '0' ?>%" aria-valuenow="<?= $data['promedio_satisfaccion'] ?? '0' ?>" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar bg-<?= $data['status_satisfaccion'] ?? 'warning' ?>" role="progressbar" style="width: <?= $data['promedio_satisfaccion'] ?? '0' ?>%" aria-valuenow="<?= $data['promedio_satisfaccion'] ?? '0' ?>" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                         <span class="text-muted mt-1 d-block">(Meta: 90%)</span>
                      </div>

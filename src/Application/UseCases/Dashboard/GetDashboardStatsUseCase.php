@@ -43,9 +43,33 @@ class GetDashboardStatsUseCase {
             'tiempo_promedio_aceptacion' => $this->formatSegundos($stats['avg_aceptacion_segundos'] ?? 0),
             'tiempo_promedio_solucion' => $this->formatSegundos($stats['avg_solucion_segundos'] ?? 0),
             'promedio_satisfaccion' => round(($stats['avg_satisfaccion'] ?? 0) / 5 * 100, 1),
+
+            // Raw values and Status for Traffic Lights (Semáforos)
+            'raw_tiempo_aceptacion' => $stats['avg_aceptacion_segundos'] ?? 0,
+            'status_aceptacion' => $this->getStatusTime($stats['avg_aceptacion_segundos'] ?? 0, 7200), // Meta: 2 horas (7200s)
+
+            'raw_tiempo_solucion' => $stats['avg_solucion_segundos'] ?? 0,
+            'status_solucion' => $this->getStatusTime($stats['avg_solucion_segundos'] ?? 0, 172800), // Meta: 2 días (172800s)
+
+            'raw_satisfaccion' => round(($stats['avg_satisfaccion'] ?? 0) / 5 * 100, 1),
+            'status_satisfaccion' => $this->getStatusSatisfaction(round(($stats['avg_satisfaccion'] ?? 0) / 5 * 100, 1), 90), // Meta: 90%
             
             'tareas_recientes' => $tareasRecientes,
         ];
+    }
+
+    private function getStatusTime(float $value, float $goal): string {
+        if ($value == 0) return 'secondary'; // No data
+        if ($value <= $goal) return 'success';
+        if ($value <= $goal * 1.5) return 'warning';
+        return 'danger';
+    }
+
+    private function getStatusSatisfaction(float $value, float $goal): string {
+        if ($value == 0) return 'secondary'; // No data
+        if ($value > 80) return 'success'; // Tolerancia: > 80% es verde
+        if ($value >= $goal * 0.8) return 'warning'; // 80% of goal
+        return 'danger';
     }
 
     /**

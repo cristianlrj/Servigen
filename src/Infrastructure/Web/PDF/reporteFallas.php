@@ -8,6 +8,7 @@
     <thead>
       <tr>
         <th>UMYPF-N°</th>
+        <th>Fecha</th>
         <th>Unidad Solicitante</th> 
         <th>Contacto</th>
         <th>Descripción de la Falla</th>
@@ -48,6 +49,7 @@
         } ?>
         <tr>
           <td><?php echo $reporte->getId(); ?></td>
+          <td><?php echo date('d-m-Y', strtotime($reporte->getFechaCreacion())); ?></td>
           <td><?php echo $departamento->getNombre(); ?></td>
           <td><?php echo $reporte->getPersonaContacto(); ?></td>
           <td><?php echo $reporte->getDescripcion(); ?></td>
