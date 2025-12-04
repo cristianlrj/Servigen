@@ -11,8 +11,8 @@ define('APP_NAME', 'SERVIGEN');
 
 // --- Configuración de PHPMailer ---
 define('MAIL_HOST', 'smtp.gmail.com'); // Ej: smtp.gmail.com o el de tu hosting
-define('MAIL_USERNAME', 'cristianrojasjimenez2003@gmail.com');
-define('MAIL_PASSWORD', 'ofwcffpxxfknucbd');
+define('MAIL_USERNAME', '');//tu correo
+define('MAIL_PASSWORD', '');//tu contraseña
 define('MAIL_PORT', 587); // 587 para TLS, 465 para SSL
 define('MAIL_ENCRYPTION', 'tls'); // 'tls' o 'ssl'
 define('MAIL_FROM_ADDRESS', 'no-reply@servigen.com');
